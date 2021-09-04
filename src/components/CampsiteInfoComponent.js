@@ -33,7 +33,7 @@ class CampsiteInfo extends React.Component{
                         </div>))}
                 </div>)
             }
-            return <div /> //I think this return is causing the issue, but I'm not sure how. Should I return comments instead? Or is it the interaction with renderCampsite?
+            return <div />
         }
 
     render() {
