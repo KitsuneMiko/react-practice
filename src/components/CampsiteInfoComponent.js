@@ -1,8 +1,107 @@
 import React from 'react';
-import { Card, CardImg, CardImgOverlay, CardText, CardBody, Breadcrumb, BreadcrumbItem } from 'reactstrap';
+import { Card, CardImg, CardImgOverlay, CardText, CardBody, Breadcrumb, BreadcrumbItem, Label } from 'reactstrap';
 import { Link } from 'react-router-dom';
+import { Button, Modal, ModalHeader, ModalBody } from 'reactstrap';
+import { Control, LocalForm, Errors } from 'react-redux-form';
+
+const required = val => val && val.length;
+const maxLength = len => val => !val || (val.length <= len);
+const minLength = len => val => val && (val.length >= len);
+
+class CommentForm extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            author: '',
+            isModalOpen: false,
+            touched: {
+                author: false
+            }
+        };
+        this.toggleModal = this.toggleModal.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+    }
 
 
+    toggleModal() {
+        this.setState({
+            isModalOpen: !this.state.isModalOpen
+        });
+    }
+
+    validate(author) {
+        const error={
+            author: ''
+        };
+    
+
+        if (this.state.touched.author) {
+            if (author.length < 2) {
+                error.author = 'Must be at least 2 characters'
+            } else if (author.length < 15) {
+                error.author = 'Must be 15 characters or less'
+            }
+        }; 
+    }
+
+    handleBlur = (field) => () => {
+        this.setState({
+            touched: {...this.setState.touched, [field]: true}
+        });
+    }
+
+    handleSubmit(values) {
+        console.log('Current state is: ' + JSON.stringify(values));
+        alert('Current state is: ' + JSON.stringify(values));
+    }
+
+    render() {
+        const error = this.validate(this.state.author);
+
+        return (
+        <div>
+            <Button className="fa fa-pencil fa-lg" outline onClick={this.toggleModal}> Submit Comment</Button>
+            <Modal isOpen={this.state.isModalOpen} toggle={this.toggleModal}>
+                <ModalHeader toggle={this.toggleModal}>
+                    Submit Comment
+                </ModalHeader>
+                <ModalBody>
+                    <LocalForm onSubmit={values => this.handleSubmit(values)}>
+                        <div className="form-group">
+                            <Label>Rating</Label>
+                            <Control.select model=".rating" id="rating" name="rating"  className="form-control" > 
+                                <option>1</option>
+                                <option>2</option>
+                                <option>3</option>
+                                <option>4</option>
+                                <option>5</option>
+                            </Control.select>
+                        </div>
+                        <div className="form-group">
+                            <Label>Your Name</Label>
+                            <Control.text model=".author" id="author" name="author" placeholder="Your Name" className="form-control"
+                            validators={{
+                                required,
+                                minLength: minLength(2),
+                                maxLength: maxLength(15) }} />
+                                <Errors className="text-danger" model=".author" show="touched" component="div" messages={{
+                                    minLength: 'Must be at least 2 characters', maxLength: 'Must be 15 characters or less'
+                                }} />
+                        </div>
+                        <div className="form-group">
+                        <Label>Comment</Label>
+                            <Control.textarea model=".text" id="text" name="text" rows="6" className="form-control" />
+                        </div>
+                        <div className="form-group">
+                            <Button type="submit" color="primary">Submit</Button>
+                        </div>
+                    </LocalForm>
+                </ModalBody>
+            </Modal>
+        </div>
+        );
+    }
+}
 
 function RenderCampsite({campsite}) { //Returns cards with the campsite image, the name and description are overlaid.
     return (
@@ -27,6 +126,7 @@ function RenderComments({comments}) {
                         <div>{comment.text}</div>
                         <div>-- {comment.author}, {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: '2-digit'}).format(new Date(Date.parse(comment.date)))} <br /><br /></div>
                     </div>))}
+                    <CommentForm />
             </div>)
         }
         return <div />
