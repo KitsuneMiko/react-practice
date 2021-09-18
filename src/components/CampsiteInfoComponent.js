@@ -3,6 +3,7 @@ import { Card, CardImg, CardImgOverlay, CardText, CardBody, Breadcrumb, Breadcru
 import { Link } from 'react-router-dom';
 import { Button, Modal, ModalHeader, ModalBody } from 'reactstrap';
 import { Control, LocalForm, Errors } from 'react-redux-form';
+import { Loading } from './LoadingComponent';
 
 const required = val => val && val.length;
 const maxLength = len => val => !val || (val.length <= len);
@@ -133,6 +134,28 @@ function RenderComments({comments, addComment, campsiteId}) {
     }
 
 function CampsiteInfo(props) {
+    //Loading screen
+    if (props.isLoading) {
+        return (
+            <div className="container">
+                <div className="row">
+                    <Loading />
+                </div>
+            </div>
+        );
+    }
+
+    //Error handling
+    if (props.errMess) {
+        return (
+            <div className="container">
+                <div className="row">
+                    <h4>{props.errMess}</h4>
+                </div>
+            </div>
+        );
+    }
+
     //is object 'campsite' truthy? Pass campsite via props.
     if (props.campsite) {
         //If yes, return empty div with row class.
